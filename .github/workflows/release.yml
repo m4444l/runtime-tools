@@ -1,0 +1,88 @@
+name: Prepare draft release
+on:
+  workflow_dispatch:
+    inputs:
+      tool:
+        type: choice
+        options: [mupdf, ffmpeg]
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ inputs.tool }}
+  cancel-in-progress: false
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 180
+    steps:
+      - name: Reject non-default-branch dispatches
+        run: test "$GITHUB_REF" = "refs/heads/$DEFAULT_BRANCH"
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - run: sudo apt-get update && sudo apt-get install -y ruby ruby-thor
+      - run: ruby bin/runtime-tools build "$TOOL" --arch "$ARCH"
+        env:
+          TOOL: ${{ inputs.tool }}
+          ARCH: ${{ matrix.arch }}
+      - run: ruby bin/runtime-tools verify "$TOOL" --arch "$ARCH"
+        env:
+          TOOL: ${{ inputs.tool }}
+          ARCH: ${{ matrix.arch }}
+      - name: Record an independent clean rebuild comparison
+        run: |
+          ruby bin/runtime-tools build "$TOOL" --arch "$ARCH" --output repeat-dist
+          ruby bin/runtime-tools compare "$TOOL" dist repeat-dist --arch "$ARCH"
+        env:
+          TOOL: ${{ inputs.tool }}
+          ARCH: ${{ matrix.arch }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: release-${{ matrix.arch }}
+          path: dist/
+          if-no-files-found: error
+  draft:
+    needs: build
+    runs-on: ubuntu-24.04
+    environment: release
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: release-*
+          path: artifacts
+      - run: sudo apt-get update && sudo apt-get install -y ruby ruby-thor
+      - name: Assemble verified release assets
+        run: ruby bin/runtime-tools assemble "$TOOL" artifacts dist
+        env:
+          TOOL: ${{ inputs.tool }}
+      - uses: actions/attest-build-provenance@43d14bc2b83dec42d39ecae14e916627a18bb661
+        with:
+          subject-path: dist/*.tar.gz
+      - name: Create draft without overwriting existing releases
+        run: ruby bin/runtime-tools draft "$TOOL" dist
+        env:
+          TOOL: ${{ inputs.tool }}
+          GH_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          RELEASE_SHA: ${{ github.sha }}

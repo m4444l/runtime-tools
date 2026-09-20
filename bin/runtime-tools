@@ -1,0 +1,103 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+require "thor"
+require_relative "../lib/runtime_tools"
+
+class RuntimeToolsCLI < Thor
+  def self.exit_on_failure? = true
+
+  desc "fetch TOOL", "Download and verify the locked sources"
+  option :sources, default: RuntimeTools.default_sources
+  def fetch(name)
+    RuntimeTools::Sources.new(options[:sources]).fetch(name)
+  end
+
+  desc "build TOOL", "Prepare a pinned builder and compile offline"
+  option :sources, default: RuntimeTools.default_sources
+  option :output, default: "dist"
+  option :arch, default: RUBY_PLATFORM.split("-").first
+  option :jobs, type: :numeric, default: 4
+  def build(name)
+    RuntimeTools::Build.new(name, options).run
+  end
+
+  desc "compile TOOL", "Internal: run inside the offline builder"
+  option :jobs, type: :numeric, default: 4
+  def compile(name)
+    require_relative "../lib/runtime_tools/compiler"
+    RuntimeTools::Compiler.new(name, options[:jobs]).run
+  end
+
+  desc "release_id TOOL", "Print the pinned release ID"
+  def release_id(name)
+    puts RuntimeTools.release(name)
+  end
+
+  desc "verify TOOL", "Test extracted archives on both supported runtimes"
+  option :output, default: "dist"
+  option :arch, default: RUBY_PLATFORM.split("-").first
+  def verify(name)
+    require_relative "../lib/runtime_tools/verification"
+    RuntimeTools::Verification.run(name, options[:output], options[:arch])
+  end
+
+  desc "assemble TOOL INPUT OUTPUT", "Validate both architectures and assemble release files"
+  def assemble(name, input, output)
+    require_relative "../lib/runtime_tools/release"
+    release = RuntimeTools.release(name)
+    FileUtils.mkdir_p(output)
+    %w[amd64 arm64].each do |arch|
+      directory = File.join(input, "release-#{arch}")
+      Dir.glob("#{directory}/#{release}-linux-#{arch}.*").each { FileUtils.cp(_1, output) }
+    end
+    first = File.join(input, "release-amd64", "#{release}-source.tar.gz")
+    second = File.join(input, "release-arm64", "#{release}-source.tar.gz")
+    raise RuntimeTools::Error, "Source bundles differ" unless Digest::SHA256.file(first).hexdigest == Digest::SHA256.file(second).hexdigest
+    FileUtils.cp(first, output)
+    RuntimeTools::Release.prepare(name, output)
+  end
+
+  desc "compare TOOL FIRST SECOND", "Record a repeat-build archive comparison"
+  option :arch, default: RUBY_PLATFORM.split("-").first
+  def compare(name, first, second)
+    arch = RuntimeTools.architecture(options[:arch])
+    root = "#{RuntimeTools.release(name)}-linux-#{arch}"
+    hashes = [first, second].map { Digest::SHA256.file(File.join(_1, "#{root}.tar.gz")).hexdigest }
+    report = { tool: name, architecture: arch, first_sha256: hashes[0], second_sha256: hashes[1], identical: hashes.uniq.length == 1 }
+    File.write(File.join(first, "#{root}.reproducibility.json"), JSON.pretty_generate(report) + "\n")
+    puts JSON.generate(report)
+  end
+
+  desc "draft TOOL DIRECTORY", "Create a draft from verified assets (explicit release workflow only)"
+  def draft(name, directory)
+    require_relative "../lib/runtime_tools/release"
+    raise RuntimeTools::Error, "Drafts require workflow_dispatch" unless ENV["GITHUB_EVENT_NAME"] == "workflow_dispatch"
+    event = JSON.parse(File.read(ENV.fetch("GITHUB_EVENT_PATH")))
+    branch = event.fetch("repository").fetch("default_branch")
+    raise RuntimeTools::Error, "Wrong release branch" unless ENV.fetch("GITHUB_REF") == "refs/heads/#{branch}"
+    sha = ENV.fetch("RELEASE_SHA")
+    raise RuntimeTools::Error, "Wrong release SHA" unless sha == ENV.fetch("GITHUB_SHA") && sha.match?(/\A[0-9a-f]{40}\z/)
+    RuntimeTools::Release.prepare(name, directory)
+    release = RuntimeTools.release(name)
+    repo = ENV.fetch("GITHUB_REPOSITORY")
+    raise RuntimeTools::Error, "Unexpected repository" unless repo == "m4444l/runtime-tools"
+    releases = JSON.parse(RuntimeTools.capture("gh", "api", "--paginate", "--slurp", "repos/#{repo}/releases?per_page=100")).flatten
+    if existing = releases.find { _1.fetch("tag_name") == release }
+      raise RuntimeTools::Error, "Release already exists: #{existing.fetch('html_url')}. Inspect any incomplete unpublished draft and clean up manually; never overwrite."
+    end
+    tags = JSON.parse(RuntimeTools.capture("gh", "api", "repos/#{repo}/git/matching-refs/tags/#{release}"))
+    raise RuntimeTools::Error, "Tag already exists; use a new revision" if tags.any? { _1.fetch("ref") == "refs/tags/#{release}" }
+    notes = File.join(directory, "release-notes.md")
+    previous = releases.find { _1.fetch("tag_name").start_with?("#{name}-") && !_1.fetch("draft") }
+    diff = if previous
+      RuntimeTools.capture("git", "diff", "#{previous.fetch('tag_name')}..#{sha}", "--", "config/lock.json")
+    else
+      File.read(File.join(RuntimeTools::ROOT, "config/lock.json"))
+    end
+    File.write(notes, "#{release}\n\nBuilt from #{sha}. See SHA256SUMS, build-info.json, verification reports, and corresponding source.\n\nExplicit tag URLs only; no latest alias.\n\nLock changes:\n\n```diff\n#{diff}\n```\n")
+    assets = File.readlines(File.join(directory, "release-assets.txt"), chomp: true)
+    RuntimeTools.run("gh", "release", "create", release, *assets, "--repo", repo, "--target", sha, "--draft", "--latest=false", "--title", release, "--notes-file", notes)
+  end
+end
+
+RuntimeToolsCLI.start(ARGV)
