@@ -51,4 +51,4 @@ accepted scope and deferred review decisions. Baseline/app integration is a late
 change, after approved public artifacts exist.
 
 See [validation and media coverage](docs/validation.md) for local evidence and
-the outstanding native AMD64 checks.
+native CI results.

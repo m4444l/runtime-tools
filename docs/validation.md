@@ -2,7 +2,9 @@
 
 Local validation on 2026-09-21, using Linux ARM64 under Colima on an ARM64 Mac.
 These are development artifacts from an uncommitted tree; the release assembler
-rejects them. Native CI and the release workflow have not been run.
+rejects them. Native CI is tracked in [PR #1](https://github.com/m4444l/runtime-tools/pull/1)
+and its [initial run](https://github.com/m4444l/runtime-tools/actions/runs/35570114924).
+The release workflow must pass separately before publication.
 
 ## Verified behavior
 
@@ -26,7 +28,9 @@ rejects them. Native CI and the release workflow have not been run.
 - Unit tests cover checksum failure before extraction, unsupported platforms,
   source-lock completeness, missing release inputs, tampered verified archives,
   rejection of builds from uncommitted changes, and successful release assembly:
-  7 tests / 125 assertions pass on host Ruby and Ubuntu's Ruby. Workflow syntax
+  The original 7 tests / 125 assertions passed on host Ruby and Ubuntu's Ruby;
+  release-report validation extends this to 143 assertions, passing locally.
+  Workflow syntax
   passes actionlint; all 11 Ruby files pass syntax checks.
 
 ## Supported media checks
@@ -54,8 +58,10 @@ single-job retry. No AMD64 artifact was produced. This is a local emulation
 limitation; it is not evidence that the native AMD64 recipe passes. Native
 `ubuntu-24.04` CI must build and test it; ARM64 CI uses `ubuntu-24.04-arm`.
 
-No release assembled, draft created, repository settings changed, or consumer
-migrated. The release workflow must still demonstrate cross-architecture source
+Repository protections are now configured: immutable releases, required native
+CI and PRs on main, protected release tags, and a main-only release environment.
+No draft has yet been created or consumer migrated. The release workflow must
+still demonstrate cross-architecture source
 bundle equality, repeat-build comparison, provenance, and draft creation after
 human review. Bit-for-bit reproducibility is not claimed. Follow the first-release
 prerequisites and deferred-decision checklist in [the runbook](releases.md).

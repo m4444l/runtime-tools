@@ -22,7 +22,12 @@ module RuntimeTools
         assets.concat([archive, "#{directory}/#{root}.verified.json"])
         comparison = "#{directory}/#{root}.reproducibility.json"
         repeat_report = JSON.parse(File.read(comparison))
-        raise Error, "Wrong repeat-build report" unless repeat_report.fetch("first_sha256") == report.fetch("sha256")
+        first, second = repeat_report.values_at("first_sha256", "second_sha256")
+        valid_hashes = [first, second].all? { _1.is_a?(String) && _1.match?(/\A[0-9a-f]{64}\z/) }
+        unless valid_hashes && repeat_report["tool"] == name && repeat_report["architecture"] == arch &&
+            first == report.fetch("sha256") && repeat_report["identical"] == (first == second)
+          raise Error, "Wrong repeat-build report"
+        end
         assets << comparison
       end
       if name == "ffmpeg"

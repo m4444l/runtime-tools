@@ -82,7 +82,7 @@ class RuntimeToolsTest < Minitest::Test
           RuntimeTools.run("tar", "-czf", archive, "-C", directory, root)
           checksum = Digest::SHA256.file(archive).hexdigest
           File.write("#{directory}/#{root}.verified.json", JSON.generate(tool: "mupdf", architecture: arch, runtimes: lock.fetch("runtimes"), cpu_baseline: true, sha256: checksum))
-          File.write("#{directory}/#{root}.reproducibility.json", JSON.generate(first_sha256: checksum, second_sha256: checksum, identical: true))
+          File.write("#{directory}/#{root}.reproducibility.json", JSON.generate(tool: "mupdf", architecture: arch, first_sha256: checksum, second_sha256: checksum, identical: true))
         end
         FileUtils.mkdir_p("#{directory}/#{release}-source")
         File.write("#{directory}/#{release}-source/fixture-source.tar", "synthetic source")
@@ -95,6 +95,17 @@ class RuntimeToolsTest < Minitest::Test
           assert_equal digest, Digest::SHA256.file("#{directory}/#{file}").hexdigest
         end
         assert_equal 8, File.readlines("#{directory}/release-assets.txt").length
+        comparison = "#{directory}/#{release}-linux-amd64.reproducibility.json"
+        valid_report = JSON.parse(File.read(comparison))
+        [{ "second_sha256" => nil }, { "second_sha256" => "invalid" }, { "identical" => false },
+          { "tool" => "ffmpeg" }, { "architecture" => "arm64" }, { "second_sha256" => "0" * 64 }].each do |change|
+          File.write(comparison, JSON.generate(valid_report.merge(change)))
+          error = assert_raises(RuntimeTools::Error) { RuntimeTools::Release.prepare("mupdf", directory) }
+          assert_match(/Wrong repeat-build report/, error.message)
+        end
+        # Different clean-build hashes are valid evidence, never a reproducibility claim.
+        File.write(comparison, JSON.generate(valid_report.merge("second_sha256" => "0" * 64, "identical" => false)))
+        RuntimeTools::Release.prepare("mupdf", directory)
       end
     end
   end

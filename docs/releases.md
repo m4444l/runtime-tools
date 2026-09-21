@@ -2,6 +2,10 @@
 
 ## Before the first release
 
+Repository protections below were configured and read back successfully on
+2026-09-21, following authorization to carry out the release setup. Keep them
+enabled for future releases.
+
 Configure GitHub immutable releases. Require PRs and passing CI on main, prohibit
 force-pushes, and protect `mupdf-*` and `ffmpeg-*` tags against updates/deletion.
 Allow the release workflow to create new tags; do not configure a creation rule
