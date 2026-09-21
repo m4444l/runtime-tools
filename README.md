@@ -65,7 +65,14 @@ a writable user cache directory. HTTPS requires `ca-certificates` at
 
 ## Releases and updates
 
-See [the release runbook](docs/releases.md). The workflow creates a **draft only**;
+**Check upstream releases** runs every Monday at 08:23 UTC and supports manual
+dispatch. It compares stable MuPDF and FFmpeg source releases with
+`config/lock.json`, writes a version table to the Actions summary, and fails when
+a newer version is available. GitHub Actions notification preferences control
+failure notifications. Fetch or parsing errors also fail the check. Run locally
+with `ruby lib/runtime_tools/upstream_releases.rb`. Pins remain unchanged.
+
+See [the release runbook](docs/releases.md). The release workflow creates a **draft only**;
 publishing remains a human step. CI artifacts are not published releases.
 Corresponding source, license notices, checksums, provenance, and verification
 reports accompany each release. Tool licenses apply independently; MuPDF is AGPL
