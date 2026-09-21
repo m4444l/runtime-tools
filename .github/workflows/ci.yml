@@ -1,0 +1,47 @@
+name: Build and verify
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  unit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: sudo apt-get update && sudo apt-get install -y ruby ruby-minitest ruby-thor
+      - run: ruby test/runtime_tools_test.rb
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        tool: [mupdf, ffmpeg]
+        arch: [amd64, arm64]
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: sudo apt-get update && sudo apt-get install -y ruby ruby-thor
+      - run: ruby bin/runtime-tools build "$TOOL" --arch "$ARCH"
+        env:
+          TOOL: ${{ matrix.tool }}
+          ARCH: ${{ matrix.arch }}
+      - run: ruby bin/runtime-tools verify "$TOOL" --arch "$ARCH"
+        env:
+          TOOL: ${{ matrix.tool }}
+          ARCH: ${{ matrix.arch }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.tool }}-${{ matrix.arch }}
+          path: dist/
+          if-no-files-found: error
