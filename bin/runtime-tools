@@ -6,6 +6,13 @@ require_relative "../lib/runtime_tools"
 class RuntimeToolsCLI < Thor
   def self.exit_on_failure? = true
 
+  desc "install", "Install the pinned precompiled runtime tools"
+  option :prefix, default: "/usr/local"
+  def install
+    require_relative "../install"
+    RuntimeTools::Installer.install(prefix: options[:prefix])
+  end
+
   desc "fetch TOOL", "Download and verify the locked sources"
   option :sources, default: RuntimeTools.default_sources
   def fetch(name)

@@ -1,0 +1,11 @@
+name: Install runtime tools
+description: Install pinned MuPDF and FFmpeg binaries with checksum verification. Requires Ruby and system runtime libraries.
+runs:
+  using: composite
+  steps:
+    - name: Install verified runtime tools
+      shell: bash
+      run: |
+        export RUNTIME_TOOLS_PREFIX="$RUNNER_TEMP/runtime-tools"
+        ruby "$GITHUB_ACTION_PATH/install.rb"
+        printf '%s\n' "$RUNTIME_TOOLS_PREFIX/bin" >> "$GITHUB_PATH"

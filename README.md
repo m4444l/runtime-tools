@@ -4,6 +4,30 @@ Pinned Linux builds of MuPDF (`mutool`, with its bundled MuJS) and FFmpeg
 (`ffmpeg`/`ffprobe`). AMD64 and ARM64 archives use the same source lock. Versions
 change through reviewed commits; consumers never install a floating latest version.
 
+## Install precompiled tools
+
+`install.rb` owns the release IDs, architecture checksums, verified extraction,
+and smoke checks. It requires only Ruby standard libraries, curl, CA certificates,
+and the system runtime libraries listed below. It never compiles sources or
+downloads a floating latest release. No GitHub token is required.
+
+For GitHub Actions, after setting up Ruby and runtime dependencies:
+
+```yaml
+- uses: m4444l/runtime-tools@<reviewed-commit-SHA>
+```
+
+The action installs into `$RUNNER_TEMP/runtime-tools` without sudo and adds its
+`bin` directory to subsequent steps' PATH. For a local checkout, use
+`bin/runtime-tools install --prefix /desired/path` (Thor required).
+
+For containers, download `install.rb` from a fixed commit, verify its SHA256
+before execution, then run `RUNTIME_TOOLS_PREFIX=/desired/path ruby install.rb`.
+The standalone script does not require Thor or the rest of this repository.
+Copy the whole installation prefix to preserve relative binary links, licenses,
+and `share/runtime-tools/versions.json`. Updates change the installer commit and
+checksum together; existing published binary releases remain immutable.
+
 ## Build and verify
 
 Requirements: Ruby 3.2+, Thor (`bundle install`), Docker, and Git. Docker must be
