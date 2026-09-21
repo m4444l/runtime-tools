@@ -30,13 +30,18 @@ class InstallerTest < Minitest::Test
 
   def test_extracts_a_verified_release_archive
     Dir.mktmpdir do |directory|
-      contents = archive_bytes([{ name: "package/VERSION", contents: "1.28.4" }])
+      contents = archive_bytes([
+        { name: "package/", type: "5" },
+        { name: "package/bin/", type: "5" },
+        { name: "package/VERSION", contents: "1.28.4" }
+      ])
       destination = File.join(directory, "extracted")
       subject_class.stub :download, contents do
         subject_class.send(:extract, "https://example.com/source.tar.gz", destination, "package",
           Digest::SHA256.hexdigest(contents))
       end
       assert_equal "1.28.4", File.read(File.join(destination, "package", "VERSION"))
+      assert File.directory?(File.join(destination, "package", "bin"))
     end
   end
 
