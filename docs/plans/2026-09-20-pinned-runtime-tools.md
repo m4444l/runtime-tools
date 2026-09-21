@@ -33,7 +33,7 @@ and release revision. No branch tips, automatic dependency upgrades, or mutable
 container tags as final build inputs. Use a digest-pinned Ubuntu 24.04 image and
 a pinned snapshot.ubuntu.com snapshot ID for build packages, recording toolchain
 and package versions. Do not maintain a separately published builder image initially.
-GitHub Actions dependencies use full commit SHAs.
+GitHub Actions dependencies use major-version tags, per the implementation review.
 
 Support Git-based dependencies such as x264 by locking the repository URL and full
 commit SHA. Generate a deterministic source archive with pinned tooling and record
