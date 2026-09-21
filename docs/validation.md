@@ -50,18 +50,30 @@ The release workflow must pass separately before publication.
 The full compiled feature inventory is embedded in each FFmpeg archive's
 `build-info.json`. This matrix does not promise parity with every distro build.
 
-## Remaining validation before publication
+## Published releases and installer validation
 
-AMD64 compilation on the ARM64 host failed inside QEMU with GCC `cc1`/`cc1plus`
-segmentation faults in unrelated MuPDF and x265 translation units, including a
-single-job retry. No AMD64 artifact was produced. This is a local emulation
-limitation; it is not evidence that the native AMD64 recipe passes. Native
-`ubuntu-24.04` CI must build and test it; ARM64 CI uses `ubuntu-24.04-arm`.
+Native main CI [35573385270](https://github.com/m4444l/runtime-tools/actions/runs/35573385270)
+passed on AMD64 and ARM64. Release runs
+[35573416591](https://github.com/m4444l/runtime-tools/actions/runs/35573416591) and
+[35573418653](https://github.com/m4444l/runtime-tools/actions/runs/35573418653)
+produced immutable MuPDF 1.28.4-r1 and FFmpeg 9.0.2-r1 releases. Both architectures
+passed both runtime distributions and baseline CPU checks. Independent clean
+builds matched byte-for-byte per architecture; FFmpeg feature inventories matched.
+Source bundles, provenance, and anonymous download checksums were verified.
 
-Repository protections are now configured: immutable releases, required native
-CI and PRs on main, protected release tags, and a main-only release environment.
-No draft has yet been created or consumer migrated. The release workflow must
-still demonstrate cross-architecture source
-bundle equality, repeat-build comparison, provenance, and draft creation after
-human review. Bit-for-bit reproducibility is not claimed. Follow the first-release
-prerequisites and deferred-decision checklist in [the runbook](releases.md).
+The installer action passed native AMD64/ARM64 jobs in
+[35586374059](https://github.com/m4444l/runtime-tools/actions/runs/35586374059).
+Consumer Docker checks also passed on both architectures, including Qonto cleanup,
+XML preservation, regex limits, non-root font rendering, and preview/probe output.
+Fontconfig creates its user cache under HOME/.cache without an XDG_CACHE_HOME override.
+Installer tests include real tar-style trailing-slash directory entries: Ruby's
+String#split drops trailing empty fields, so these entries were already accepted.
+
+Local AMD64 source compilation under ARM64 QEMU previously crashed in GCC;
+native CI closed that validation gap. Local cross-architecture installation and
+runtime smoke checks work; native runners remain the source-build authority.
+
+Immutable releases, main history protection, protected release tags, and the
+main-only release environment remain enabled. Shipping now uses ship-worktree
+without PRs or pre-push CI gates, per the user's repository workflow preference.
+See [the runbook](releases.md) for retained deferred policy decisions.

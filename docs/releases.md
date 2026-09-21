@@ -6,8 +6,10 @@ Repository protections below were configured and read back successfully on
 2026-09-21, following authorization to carry out the release setup. Keep them
 enabled for future releases.
 
-Configure GitHub immutable releases. Require PRs and passing CI on main, prohibit
-force-pushes, and protect `mupdf-*` and `ffmpeg-*` tags against updates/deletion.
+Configure GitHub immutable releases, prohibit force-pushes/deletion of main, and
+protect `mupdf-*` and `ffmpeg-*` tags against updates/deletion. Changes land directly
+through the `ship-worktree` skill, without PRs. CI runs on main after shipping;
+PR and pre-push status requirements are not enabled for this workflow.
 Allow the release workflow to create new tags; do not configure a creation rule
 that blocks its repository-scoped GITHUB_TOKEN. Set the `release` environment to
 allow the default branch only. Administrator bypass remains possible. No private
@@ -18,14 +20,17 @@ does not change repository settings. Review the selected upstream licenses and
 corresponding source before distributing binaries. Source bundles include the exact
 locked upstream archives, recipes, lock, and notices; inspect them for completeness.
 
-Revisit deferred decisions 3, 12, 17, 19, and 20 from the plan for each tool's first
-publication; explicitly record implementation or continued deferral. Do not silently
-interpret a deferred item as resolved. Review final implementation validation and
+The following review decisions remain explicitly deferred: formal update/security
+monitoring and runtime network restrictions (3), independent bundled-MuJS tree
+hashing (12), mandatory cross-architecture inventory review gates (17), a separate
+compiled-cache policy (19), and automatic draft-download verification (20). Both
+first releases recorded continued deferral; manual draft and inventory review was
+performed. Do not interpret those manual checks as new mandatory policy gates. Review final implementation validation and
 remaining platform limitations before triggering the draft workflow.
 
 ## Prepare a draft
 
-1. Merge the reviewed implementation/version change, including source hashes and
+1. Ship the reviewed implementation/version change, including source hashes and
    any new release revision. Both architectures and both runtimes must pass CI.
 2. Manually dispatch **Prepare draft release** on the default branch and select
    `mupdf` or `ffmpeg`. It builds the exact dispatch SHA, compiles offline, tests
@@ -74,8 +79,8 @@ a loopback fixture only; compilation remains offline. Verification reports bind
 successful tests to the archive SHA256 and runtime image digests. CI checks the
 same artifacts which the release job uploads.
 
-This repository does not install binaries into app containers or change Baseline.
-The installer must verify the committed SHA256 before extraction, reject unsafe
+This repository owns the installer and setup action used by consumers such as
+Baseline. The installer must verify the committed SHA256 before extraction, reject unsafe
 archive paths, keep required metadata/licenses, and fail without fallback to latest.
 
 The release workflow records a second clean build's archive hash in a

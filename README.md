@@ -14,19 +14,21 @@ downloads a floating latest release. No GitHub token is required.
 For GitHub Actions, after setting up Ruby and runtime dependencies:
 
 ```yaml
-- uses: m4444l/runtime-tools@<reviewed-commit-SHA>
+- uses: m4444l/runtime-tools@main
 ```
 
 The action installs into `$RUNNER_TEMP/runtime-tools` without sudo and adds its
 `bin` directory to subsequent steps' PATH. For a local checkout, use
 `bin/runtime-tools install --prefix /desired/path` (Thor required).
 
-For containers, download `install.rb` from a fixed commit, verify its SHA256
-before execution, then run `RUNTIME_TOOLS_PREFIX=/desired/path ruby install.rb`.
+For containers, download `install.rb` from `main`, then run
+`RUNTIME_TOOLS_PREFIX=/desired/path ruby install.rb`. Consumers follow explicit
+installer/release-pin updates committed to main; upstream releases never update
+the pins automatically. Consumers requiring an immutable installer can instead
+use a fixed commit and verify the script's SHA256 before execution.
 The standalone script does not require Thor or the rest of this repository.
 Copy the whole installation prefix to preserve relative binary links, licenses,
-and `share/runtime-tools/versions.json`. Updates change the installer commit and
-checksum together; existing published binary releases remain immutable.
+and `share/runtime-tools/versions.json`. Published binary releases remain immutable.
 
 ## Build and verify
 
@@ -70,9 +72,15 @@ reports accompany each release. Tool licenses apply independently; MuPDF is AGPL
 and the selected FFmpeg configuration is GPL-enabled. Inspect the included license
 files and fulfill their redistribution requirements before publishing binaries.
 
-The [implementation plan](docs/plans/2026-09-20-pinned-runtime-tools.md) records the
-accepted scope and deferred review decisions. Baseline/app integration is a later
-change, after approved public artifacts exist.
+Baseline uses this installer for containers and CI. Deferred review decisions
+remain recorded in [the release runbook](docs/releases.md).
 
 See [validation and media coverage](docs/validation.md) for local evidence and
 native CI results.
+
+## Shipping changes
+
+Use the `ship-worktree` skill to land reviewed, tested changes directly on main.
+Do not create pull requests or push worktree branches. CI runs after shipping;
+release preparation still requires successful native validation. Shipping code
+does not publish binary releases automatically.
