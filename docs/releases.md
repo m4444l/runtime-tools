@@ -20,8 +20,12 @@ does not change repository settings. Review the selected upstream licenses and
 corresponding source before distributing binaries. Source bundles include the exact
 locked upstream archives, recipes, lock, and notices; inspect them for completeness.
 
-The following review decisions remain explicitly deferred: formal update/security
-monitoring and runtime network restrictions (3), independent bundled-MuJS tree
+Upstream version and advisory monitoring is now owned by the `dependency-audit`
+skill, covering the tools, pinned libraries/build dependencies and bundled MuJS.
+Audit findings do not authorize binary publication or consumer rollout.
+
+The following review decisions remain explicitly deferred: runtime network
+restrictions (remaining part of 3), independent bundled-MuJS tree
 hashing (12), mandatory cross-architecture inventory review gates (17), a separate
 compiled-cache policy (19), and automatic draft-download verification (20). Both
 first releases recorded continued deferral; manual draft and inventory review was

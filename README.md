@@ -65,12 +65,12 @@ a writable user cache directory. HTTPS requires `ca-certificates` at
 
 ## Releases and updates
 
-**Check upstream releases** runs every Monday at 08:23 UTC and supports manual
-dispatch. It compares stable MuPDF and FFmpeg source releases with
-`config/lock.json`, writes a version table to the Actions summary, and fails when
-a newer version is available. GitHub Actions notification preferences control
-failure notifications. Fetch or parsing errors also fail the check. Run locally
-with `ruby lib/runtime_tools/upstream_releases.rb`. Pins remain unchanged.
+Upstream monitoring belongs to the `dependency-audit` skill. It reads
+`config/lock.json` and checks MuPDF, FFmpeg, every pinned source library/build
+dependency, and bundled MuJS. Results and update decisions live in the private
+dependency-audits repository. This repository has no scheduled update checker;
+source pins and release preparation remain managed here. An audit does not
+automatically change pins, rebuild binaries or publish releases.
 
 See [the release runbook](docs/releases.md). The release workflow creates a **draft only**;
 publishing remains a human step. CI artifacts are not published releases.
