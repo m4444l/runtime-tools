@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    minitest (5.26.1)
+    minitest (5.27.0)
     thor (1.5.0)
 
 PLATFORMS
@@ -9,12 +9,16 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  minitest (= 5.26.1)
-  thor (= 1.5.0)
+  minitest (~> 5.27)
+  thor (~> 1.5)
 
 CHECKSUMS
-  minitest (5.26.1) sha256=f16a63d4278e230bba342c3bda3006a69c5216d46461b77dd57f7c7c529b5a96
+  bundler (4.0.21) sha256=7cbf5499b426076aa16c8d28a59e4c2c3aad5a438402abcd961f0119f29f1dd0
+  minitest (5.27.0) sha256=2d3b17f8a36fe7801c1adcffdbc38233b938eb0b4966e97a6739055a45fa77d5
   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
 
+RUBY VERSION
+  ruby 4.0.5
+
 BUNDLED WITH
-  4.0.16
+  4.0.21
