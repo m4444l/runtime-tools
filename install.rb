@@ -17,9 +17,9 @@ module RuntimeTools
         "amd64" => "9787e05d515595ab0a7395ed0d04f0089f2b7b3ed8c0572ce26b26128a7b1c54",
         "arm64" => "b145b8d4d2c116330871e463c661e77af6df72788552b18e88c12ed699c5849c"
       } },
-      "ffmpeg" => { release: "ffmpeg-9.0.2-r1", binaries: %w[ffmpeg ffprobe], sha256: {
-        "amd64" => "02f1f6a27f802c73cb5cac8ffeb162f3de16a3eccb318dd05d6c13936aaa6a9d",
-        "arm64" => "b5a5814a5378ceb574eed3434ab7fda2277a557b63338cb06188d0ce1d90ffd1"
+      "ffmpeg" => { release: "ffmpeg-9.0.2-r2", binaries: %w[ffmpeg ffprobe], sha256: {
+        "amd64" => "ed648752836d14213d8639b11c244f6dc72d66cb13cd50e952c4389e24a24615",
+        "arm64" => "18594e11ae49085398e6e0a1406e285d27baed49f7a405a1eebe1f960e574cf6"
       } }
     }.freeze
 
