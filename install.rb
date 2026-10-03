@@ -13,9 +13,9 @@ module RuntimeTools
   # Shared by CI and container builds; only Ruby standard libraries are needed.
   module Installer
     RELEASES = {
-      "mupdf" => { release: "mupdf-1.28.4-r1", binaries: %w[mutool], sha256: {
-        "amd64" => "9787e05d515595ab0a7395ed0d04f0089f2b7b3ed8c0572ce26b26128a7b1c54",
-        "arm64" => "b145b8d4d2c116330871e463c661e77af6df72788552b18e88c12ed699c5849c"
+      "mupdf" => { release: "mupdf-1.28.5-r1", binaries: %w[mutool], sha256: {
+        "amd64" => "e25097e96d82dcd367b538cfa0c6cfe9d9593136c17c0d33f96c830ed7aeab7d",
+        "arm64" => "b50bcf77bb67b855d4eee6d872355328f79e84d5d4c40e2b90db9723311d16db"
       } },
       "ffmpeg" => { release: "ffmpeg-9.0.2-r2", binaries: %w[ffmpeg ffprobe], sha256: {
         "amd64" => "ed648752836d14213d8639b11c244f6dc72d66cb13cd50e952c4389e24a24615",
