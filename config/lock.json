@@ -10,7 +10,7 @@
   },
   "tools": {
     "mupdf": {
-      "version": "1.28.4",
+      "version": "1.28.5",
       "revision": 1,
       "sources": [
         "mupdf"
@@ -18,7 +18,7 @@
       "binaries": [
         "mutool"
       ],
-      "mujs_commit": "e892c9fdbbddba94e52f656ccb378ed4885e30cc"
+      "mujs_commit": "2c61a7bed7e7625c03c6e82e644a711ac4471c1e"
     },
     "ffmpeg": {
       "version": "9.0.2",
@@ -123,10 +123,10 @@
       "sha256": "ddfe36cab873794038ae2c1210557ad34857a4b6bdc515785d1da9e175b1da1e"
     },
     "mupdf": {
-      "version": "1.28.4",
-      "url": "https://github.com/ArtifexSoftware/mupdf-downloads/releases/download/1.28.4/mupdf-1.28.4-source.tar.gz",
-      "file": "mupdf-mupdf-1.28.4-source.tar.gz",
-      "sha256": "2d97e043a616f96b148657c9c3d81ad71c4bd2052c59a2a3315ad842599340f9"
+      "version": "1.28.5",
+      "url": "https://github.com/ArtifexSoftware/mupdf-downloads/releases/download/1.28.5/mupdf-1.28.5-source.tar.gz",
+      "file": "mupdf-mupdf-1.28.5-source.tar.gz",
+      "sha256": "98a5c10cda20c3992cdf76ff6b2a1149c32bd79cc796d3f703230b1185b7e934"
     },
     "nettle": {
       "version": "3.10.2",
