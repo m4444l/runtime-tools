@@ -22,7 +22,7 @@
     },
     "ffmpeg": {
       "version": "9.0.2",
-      "revision": 2,
+      "revision": 3,
       "sources": [
         "meson",
         "zlib",
@@ -69,10 +69,10 @@
       "sha256": "686616b7c69eb88d44459391ab25cac13b6647a3b288835c5784e71c1514a5c5"
     },
     "expat": {
-      "version": "2.8.5",
-      "url": "https://github.com/libexpat/libexpat/releases/download/R_2_8_5/expat-2.8.5.tar.xz",
-      "file": "expat-expat-2.8.5.tar.xz",
-      "sha256": "1e727b8933ec51a77a9a9d9afcf8e688bce45d907c13e36ab7393fe36e703182"
+      "version": "2.9.0",
+      "url": "https://github.com/libexpat/libexpat/releases/download/R_2_9_0/expat-2.9.0.tar.xz",
+      "file": "expat-expat-2.9.0.tar.xz",
+      "sha256": "1e6371862cc31999b368c3b89b49994f0677e1bab5f1b2b85ae3741f5d803051"
     },
     "ffmpeg": {
       "version": "9.0.2",
@@ -111,10 +111,10 @@
       "sha256": "ffed8ec1bf09c2426d4f14aae377de4753b53e537d685e604e99a8b16ca9c97e"
     },
     "harfbuzz": {
-      "version": "14.5.1",
-      "url": "https://github.com/harfbuzz/harfbuzz/releases/download/14.5.1/harfbuzz-14.5.1.tar.xz",
-      "file": "harfbuzz-harfbuzz-14.5.1.tar.xz",
-      "sha256": "7e2fa4e8c7c98e8d8140671f5772542afaaa6acccfbd746506886b6d85f7f8d6"
+      "version": "14.6.0",
+      "url": "https://github.com/harfbuzz/harfbuzz/releases/download/14.6.0/harfbuzz-14.6.0.tar.xz",
+      "file": "harfbuzz-harfbuzz-14.6.0.tar.xz",
+      "sha256": "d07a007327277708a2a73ae437887cdbaf282937f6d03ca5467723e9099af586"
     },
     "lame": {
       "version": "3.100",
