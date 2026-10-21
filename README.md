@@ -65,10 +65,10 @@ a writable user cache directory. HTTPS requires `ca-certificates` at
 
 ## Releases and updates
 
-Upstream monitoring belongs to the `dependency-audit` skill. It reads
+Upstream monitoring belongs to the `upkeep` skill. It reads
 `config/lock.json` and checks MuPDF, FFmpeg, every pinned source library/build
 dependency, and bundled MuJS. Results and update decisions live in the private
-dependency-audits repository. This repository has no scheduled update checker;
+upkeep repository. This repository has no scheduled update checker;
 source pins and release preparation remain managed here. An audit does not
 automatically change pins, rebuild binaries or publish releases.
 

@@ -20,7 +20,7 @@ does not change repository settings. Review the selected upstream licenses and
 corresponding source before distributing binaries. Source bundles include the exact
 locked upstream archives, recipes, lock, and notices; inspect them for completeness.
 
-Upstream version and advisory monitoring is now owned by the `dependency-audit`
+Upstream version and advisory monitoring is now owned by the `upkeep`
 skill, covering the tools, pinned libraries/build dependencies and bundled MuJS.
 Audit findings do not authorize binary publication or consumer rollout.
 
