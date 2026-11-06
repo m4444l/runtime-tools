@@ -36,6 +36,86 @@ module Smoke
     File.binwrite(path, document)
   end
 
+# Lossless RGB24 -> PNG -> RGB24 must reproduce every byte (exercises zlib deflate/inflate in FFmpeg's PNG codec).
+def self.png_round_trip(command, common)
+  pixels = Array.new(128 * 96 * 3) { |i| (i * 7 + i / 384 * 13) % 256 }.pack("C*")
+  File.binwrite("rgb.raw", pixels)
+  command.call("ffmpeg", *common, "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", "128x96", "-i", "rgb.raw", "-frames:v", "1", "roundtrip.png")
+  raise "PNG round trip signature missing" unless File.binread("roundtrip.png", 8) == "\x89PNG\r\n\x1a\n".b
+  command.call("ffmpeg", *common, "-i", "roundtrip.png", "-f", "rawvideo", "-pix_fmt", "rgb24", "roundtrip.raw")
+  raise "PNG round trip changed pixels" unless File.binread("roundtrip.raw") == pixels
+end
+
+# FLV container with H.264/AAC plus Flash Screen Video, whose decoder inflates zlib data.
+def self.flv_stream(command, common, rails)
+  audio = %w[-f s16le -ar 48000 -ac 1 -i audio.s16]
+  command.call("ffmpeg", *common, "-i", "input.y4m", *audio, "-c:v", "libx264", "-c:a", "aac", "-f", "flv", "stream.flv")
+  info = JSON.parse(command.call("ffprobe", *rails.fetch("probe"), "stream.flv"))
+  codecs = info.fetch("streams").map { _1["codec_name"] }.sort
+  raise "Wrong FLV streams #{codecs}" unless codecs == %w[aac h264]
+  command.call("ffmpeg", *common, "-i", "stream.flv", "-f", "null", "-")
+  command.call("ffmpeg", *common, "-i", "input.y4m", "-c:v", "flashsv", "-f", "flv", "screen.flv")
+  raise "Wrong Flash Screen Video codec" unless JSON.parse(command.call("ffprobe", *rails.fetch("probe"), "screen.flv")).fetch("streams").first["codec_name"] == "flashsv"
+  command.call("ffmpeg", *common, "-i", "screen.flv", "-f", "null", "-")
+  decoded = command.call("ffmpeg", *common, "-i", "screen.flv", "-pix_fmt", "bgr24", "-f", "rawvideo", "-").bytesize
+  raise "Wrong Flash Screen Video frames" unless decoded == 128 * 96 * 3 * 10
+end
+
+# Loopback HTTP server answering with Content-Encoding: gzip; FFmpeg must request and inflate it.
+def self.http_gzip_stream(command, common)
+  require "socket"
+  require "zlib"
+  plain = File.binread("audio.s16")
+  body = Zlib.gzip(plain)
+  server = TCPServer.new("127.0.0.1", 0)
+  port = server.addr[1]
+  requests = []
+  thread = Thread.new do
+    loop do
+      client = server.accept
+      request = +""
+      request << client.readpartial(4096) until request.include?("\r\n\r\n")
+      requests << request
+      gzip = request.match?(/^Accept-Encoding:.*gzip/i)
+      payload = gzip ? body : plain
+      headers = ["HTTP/1.1 200 OK", "Content-Type: audio/L16", "Content-Length: #{payload.bytesize}", "Connection: close"]
+      headers << "Content-Encoding: gzip" if gzip
+      client.write(headers.join("\r\n") + "\r\n\r\n" + payload)
+      client.close
+    end
+  rescue IOError, EOFError, SystemCallError
+    nil
+  end
+  begin
+    url = "http://127.0.0.1:#{port}/audio.s16"
+    output = command.call("ffmpeg", *common, "-headers", "Accept-Encoding: gzip\r\n", "-f", "s16le", "-ar", "48000", "-ac", "1", "-i", url, "-f", "s16le", "-")
+    raise "HTTP gzip request lacked Accept-Encoding" unless requests.any? { _1.match?(/^Accept-Encoding:.*gzip/i) }
+    raise "HTTP gzip stream changed samples" unless output.b == plain.b
+  ensure
+    thread.kill
+    server.close
+  end
+end
+
+# Preview of the committed fixture using the Rails flags; checks size and picture content.
+def self.fixture_preview(command, common, rails)
+  jpeg = command.call("ffmpeg", "-i", "#{__dir__}/fixtures/h264-aac.mp4", *rails.fetch("preview")).b
+  raise "Invalid fixture preview" unless jpeg.start_with?("\xff\xd8".b)
+  File.binwrite("fixture-preview.jpg", jpeg)
+  command.call("ffmpeg", *common, "-i", "fixture-preview.jpg", "-frames:v", "1", "fixture-preview.png")
+  raise "Wrong fixture preview dimensions" unless File.binread("fixture-preview.png")[16, 8].unpack("NN") == [128, 96]
+  pixels = command.call("ffmpeg", *common, "-i", "fixture-preview.jpg", "-pix_fmt", "gray", "-f", "rawvideo", "-").bytes
+  raise "Wrong fixture preview content" unless pixels.length == 128 * 96 && pixels.uniq.length > 16
+end
+
+# Stock Fontconfig (distro /etc/fonts, no overrides) must load without errors and resolve a family name.
+def self.stock_fontconfig(wrapper, root)
+  raise "Stock Fontconfig test must not override its configuration" if ENV.key?("FONTCONFIG_FILE") || ENV.key?("FONTCONFIG_PATH")
+  _, error, status = Open3.capture3(*wrapper, "#{root}/bin/ffmpeg", "-hide_banner", "-loglevel", "info", "-y", "-i", "video.mp4", "-vf", "drawtext=text=Hello:font=DejaVu Sans", "-frames:v", "1", "fontconfig.png")
+  raise "Stock Fontconfig drawtext failed\n#{error}" unless status.success?
+  raise "Fontconfig reported errors\n#{error}" if error.match?(/fontconfig (error|warning)/i)
+end
+
   def self.check(tool, root)
     expected_version = JSON.parse(File.read("#{root}/build-info.json")).fetch("lock").fetch("tools").fetch(tool).fetch("version")
     binaries = tool == "mupdf" ? %w[mutool] : %w[ffmpeg ffprobe]
@@ -75,6 +155,10 @@ module Smoke
           command.call("ffmpeg", *common, "-i", "preview.jpg", "-frames:v", "1", "preview.png")
           raise "PNG output missing" unless File.binread("preview.png", 8) == "\x89PNG\r\n\x1a\n".b
           raise "Wrong preview dimensions" unless File.binread("preview.png")[16, 8].unpack("NN") == [128, 96]
+          png_round_trip(command, common)
+          flv_stream(command, common, rails)
+          http_gzip_stream(command, common)
+          fixture_preview(command, common, rails)
           pixels = command.call("ffmpeg", *common, "-i", "preview.jpg", "-pix_fmt", "gray", "-f", "rawvideo", "-").bytes
           raise "Wrong preview content" unless pixels.length == 128 * 96 && pixels.sum.fdiv(pixels.length).between?(80, 110)
           command.call("ffmpeg", *common, "-i", "input.y4m", *audio, "-c:v", "libvpx-vp9", "-deadline", "realtime", "-cpu-used", "8", "-c:a", "libopus", "video.webm")
@@ -106,6 +190,7 @@ module Smoke
             File.write("caption.srt", "1\n00:00:00,000 --> 00:00:01,000\nSynthetic subtitle\n")
             command.call("ffmpeg", *common, "-i", "video.mp4", "-vf", "drawtext=text=Hello:fontcolor=white,subtitles=caption.srt", "-frames:v", "1", "text.png")
             command.call("ffmpeg", *common, "-i", "video.mp4", "-frames:v", "1", "plain.png")
+            stock_fontconfig(wrapper, root)
             raise "Text rendering did not affect output" if File.binread("text.png") == File.binread("plain.png")
           else
             _, error, status = Open3.capture3(*wrapper, "#{root}/bin/ffmpeg", *common, "-i", "video.mp4", "-vf", "drawtext=text=Hello", "-frames:v", "1", "text.png")

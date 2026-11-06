@@ -77,3 +77,14 @@ Immutable releases, main history protection, protected release tags, and the
 main-only release environment remain enabled. Shipping now uses ship-worktree
 without PRs or pre-push CI gates, per the user's repository workflow preference.
 See [the runbook](releases.md) for retained deferred policy decisions.
+
+## FFmpeg r6 library update checks
+
+Added for the Expat 2.10.0, zlib 1.4 and HarfBuzz 15.1.0 source batch. `smoke.rb`
+(run by `verify`) now also covers a lossless PNG round trip, H.264/AAC and Flash
+Screen Video FLV streams, an HTTP response with `Content-Encoding: gzip` from a
+loopback server, a preview of the committed fixture with the Rails flags, and,
+in the non-root font run, a stock Fontconfig load (no config overrides, no
+Fontconfig errors). `test/shaping.rb` compares Arabic and Hebrew drawtext and
+libass output between the published r5 archive and a candidate archive in the
+fonts image. Local runs cover ARM64 only; AMD64 source builds need native CI.
