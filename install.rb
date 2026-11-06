@@ -13,13 +13,13 @@ module RuntimeTools
   # Shared by CI and container builds; only Ruby standard libraries are needed.
   module Installer
     RELEASES = {
-      "mupdf" => { release: "mupdf-1.28.5-r1", binaries: %w[mutool], sha256: {
-        "amd64" => "e25097e96d82dcd367b538cfa0c6cfe9d9593136c17c0d33f96c830ed7aeab7d",
-        "arm64" => "b50bcf77bb67b855d4eee6d872355328f79e84d5d4c40e2b90db9723311d16db"
+      "mupdf" => { release: "mupdf-1.28.6-r1", binaries: %w[mutool], sha256: {
+        "amd64" => "1b0e843a93c24439831632988bbf208f2384980f5f90f651bdeed45636ae3fc3",
+        "arm64" => "33b984b9f43aef27a58329b435b2a8ac74baa49523edefe8f6e934604747d255"
       } },
-      "ffmpeg" => { release: "ffmpeg-9.0.2-r3", binaries: %w[ffmpeg ffprobe], sha256: {
-        "amd64" => "f8157d872b4226c339a90d6987648234ee62a5acc26e0c43918407a4e6fe99d8",
-        "arm64" => "1399721cc13c212ead259d4d6672fd4432e44866242e4c995b352f99833066c4"
+      "ffmpeg" => { release: "ffmpeg-9.0.2-r5", binaries: %w[ffmpeg ffprobe], sha256: {
+        "amd64" => "d245f2315aac3352e841a57e625acf9b0850c5b90457b1b84e888206f536a506",
+        "arm64" => "feeff3a2e682f2b6f2b0d95bbf009a485ba1db30d265a2282cfc78161c4cae68"
       } }
     }.freeze
 
