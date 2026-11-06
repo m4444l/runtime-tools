@@ -22,7 +22,7 @@
     },
     "ffmpeg": {
       "version": "9.0.2",
-      "revision": 5,
+      "revision": 6,
       "sources": [
         "meson",
         "zlib",
@@ -69,10 +69,10 @@
       "sha256": "686616b7c69eb88d44459391ab25cac13b6647a3b288835c5784e71c1514a5c5"
     },
     "expat": {
-      "version": "2.9.0",
-      "url": "https://github.com/libexpat/libexpat/releases/download/R_2_9_0/expat-2.9.0.tar.xz",
-      "file": "expat-expat-2.9.0.tar.xz",
-      "sha256": "1e6371862cc31999b368c3b89b49994f0677e1bab5f1b2b85ae3741f5d803051"
+      "version": "2.10.0",
+      "url": "https://github.com/libexpat/libexpat/releases/download/R_2_10_0/expat-2.10.0.tar.xz",
+      "file": "expat-expat-2.10.0.tar.xz",
+      "sha256": "c624ba2998fc65df1163a49641ff3f9ab73138b11641d92c86bee0fb01b1bc7f"
     },
     "ffmpeg": {
       "version": "9.0.2",
@@ -111,10 +111,10 @@
       "sha256": "ffed8ec1bf09c2426d4f14aae377de4753b53e537d685e604e99a8b16ca9c97e"
     },
     "harfbuzz": {
-      "version": "15.0.0",
-      "url": "https://github.com/harfbuzz/harfbuzz/releases/download/15.0.0/harfbuzz-15.0.0.tar.xz",
-      "file": "harfbuzz-harfbuzz-15.0.0.tar.xz",
-      "sha256": "968536e9abd782f07f7954044c0c4020199fcdd39b41d221ec42d2a3be4a44df"
+      "version": "15.1.0",
+      "url": "https://github.com/harfbuzz/harfbuzz/releases/download/15.1.0/harfbuzz-15.1.0.tar.xz",
+      "file": "harfbuzz-harfbuzz-15.1.0.tar.xz",
+      "sha256": "0fc7c565443a5f4be7da65ac5ee5bd737d9b158dc908708b7689a0a5796b0c8d"
     },
     "lame": {
       "version": "3.100",
@@ -196,10 +196,10 @@
       "sha256": "a31699c6a89806b74b0151e5e6a7df65de4b49050482fe5ebf8a4379d7af8f29"
     },
     "zlib": {
-      "version": "1.3.2",
-      "url": "https://zlib.net/fossils/zlib-1.3.2.tar.gz",
-      "file": "zlib-zlib-1.3.2.tar.gz",
-      "sha256": "bb329a0a2cd0274d05519d61c667c062e06990d72e125ee2dfa8de64f0119d16"
+      "version": "1.4",
+      "url": "https://zlib.net/fossils/zlib-1.4.tar.gz",
+      "file": "zlib-zlib-1.4.tar.gz",
+      "sha256": "02dd159783677a749c04adbdd02b55b8a2bcc7e054f51b76b549199a916ad584"
     },
     "meson": {
       "version": "1.9.0",
