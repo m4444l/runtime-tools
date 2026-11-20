@@ -21,8 +21,8 @@
       "mujs_commit": "2c61a7bed7e7625c03c6e82e644a711ac4471c1e"
     },
     "ffmpeg": {
-      "version": "9.0.2",
-      "revision": 6,
+      "version": "9.1",
+      "revision": 1,
       "sources": [
         "meson",
         "zlib",
@@ -63,10 +63,10 @@
       "sha256": "2dca25c0e0c837ddf00b52011b3f82cac1e4ddd3ad018227806b0c2288864acc"
     },
     "dav1d": {
-      "version": "1.5.4",
-      "url": "https://downloads.videolan.org/pub/videolan/dav1d/1.5.4/dav1d-1.5.4.tar.xz",
-      "file": "dav1d-dav1d-1.5.4.tar.xz",
-      "sha256": "686616b7c69eb88d44459391ab25cac13b6647a3b288835c5784e71c1514a5c5"
+      "version": "1.5.5",
+      "url": "https://downloads.videolan.org/pub/videolan/dav1d/1.5.5/dav1d-1.5.5.tar.xz",
+      "file": "dav1d-dav1d-1.5.5.tar.xz",
+      "sha256": "ca96b1d0ba3f01f55de7231d775892b64994ba061aaeeaaa4f662a390b3abf9e"
     },
     "expat": {
       "version": "2.10.0",
@@ -75,10 +75,10 @@
       "sha256": "c624ba2998fc65df1163a49641ff3f9ab73138b11641d92c86bee0fb01b1bc7f"
     },
     "ffmpeg": {
-      "version": "9.0.2",
-      "url": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz",
-      "file": "ffmpeg-ffmpeg-9.0.2.tar.xz",
-      "sha256": "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e"
+      "version": "9.1",
+      "url": "https://ffmpeg.org/releases/ffmpeg-9.1.tar.xz",
+      "file": "ffmpeg-ffmpeg-9.1.tar.xz",
+      "sha256": "1a4d394ae63d190a526cd052eb4415c156b5c5e2df37efab41a7de0b8fde2433"
     },
     "fontconfig": {
       "version": "2.16.0",
@@ -105,16 +105,16 @@
       "sha256": "a3c2b80201b89e68616f4ad30bc66aee4927c3ce50e33929ca819d5c43538898"
     },
     "gnutls": {
-      "version": "3.8.13",
-      "url": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.13.tar.xz",
-      "file": "gnutls-gnutls-3.8.13.tar.xz",
-      "sha256": "ffed8ec1bf09c2426d4f14aae377de4753b53e537d685e604e99a8b16ca9c97e"
+      "version": "3.8.14",
+      "url": "https://www.gnupg.org/ftp/gcrypt/gnutls/v3.8/gnutls-3.8.14.tar.xz",
+      "file": "gnutls-gnutls-3.8.14.tar.xz",
+      "sha256": "7e2d258071f5db9620aa7ff34259331d004f7beafa3eb18560cfaf60acfbf02a"
     },
     "harfbuzz": {
-      "version": "15.1.0",
-      "url": "https://github.com/harfbuzz/harfbuzz/releases/download/15.1.0/harfbuzz-15.1.0.tar.xz",
-      "file": "harfbuzz-harfbuzz-15.1.0.tar.xz",
-      "sha256": "0fc7c565443a5f4be7da65ac5ee5bd737d9b158dc908708b7689a0a5796b0c8d"
+      "version": "15.2.0",
+      "url": "https://github.com/harfbuzz/harfbuzz/releases/download/15.2.0/harfbuzz-15.2.0.tar.xz",
+      "file": "harfbuzz-harfbuzz-15.2.0.tar.xz",
+      "sha256": "e2ec49090744383cdbe7df808c1cedaafba06a97be8dc4211fe546ba585f12cb"
     },
     "lame": {
       "version": "3.100",
