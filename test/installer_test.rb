@@ -9,7 +9,7 @@ class InstallerTest < Minitest::Test
 
   def test_pins_both_supported_architectures_to_explicit_release_checksums
     subject_class::RELEASES.each do |name, spec|
-      assert_match(/\A#{Regexp.escape(name)}-\d+\.\d+\.\d+-r\d+\z/, spec.fetch(:release))
+      assert_match(/\A#{Regexp.escape(name)}-\d+(?:\.\d+){1,2}-r\d+\z/, spec.fetch(:release))
       assert_equal %w[amd64 arm64], spec.fetch(:sha256).keys.sort
       spec.fetch(:sha256).each_value { assert_match(/\A[0-9a-f]{64}\z/, _1) }
     end
